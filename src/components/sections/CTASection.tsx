@@ -42,10 +42,10 @@ export default function CTASection() {
           <Camera className="w-14 h-14 text-[var(--color-gold)] relative" />
         </motion.div>
 
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl mb-8 leading-tight drop-shadow-2xl text-white-force">
+        <h2 className="font-display-kr text-4xl md:text-5xl lg:text-6xl mb-8 leading-[1.2] drop-shadow-2xl text-white-force">
           나만의 완벽한 스튜디오를
           <br />
-          <span className="italic text-gold-force">지금 찾아보세요</span>
+          <span className="text-gold-force">지금 찾아보세요</span>
         </h2>
         <p className="text-white/80 max-w-xl mx-auto mb-12 text-lg leading-relaxed">
           1,000개 이상의 검증된 스튜디오 중에서
