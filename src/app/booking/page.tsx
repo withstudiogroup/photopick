@@ -14,11 +14,12 @@ import {
   CreditCard,
   CheckCircle2,
   ArrowLeft,
+  Sparkles,
+  Shield,
 } from "lucide-react";
-import { format, addDays, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isBefore } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isToday, isBefore } from "date-fns";
 import { ko } from "date-fns/locale";
 
-// Step Progress Component
 function StepProgress({ currentStep }: { currentStep: number }) {
   const steps = [
     { id: 1, label: "일정 선택" },
@@ -29,28 +30,35 @@ function StepProgress({ currentStep }: { currentStep: number }) {
   ];
 
   return (
-    <div className="flex items-center justify-center gap-2 mb-8">
+    <div className="flex items-center justify-center gap-1 md:gap-2 mb-10">
       {steps.map((step, index) => (
         <div key={step.id} className="flex items-center">
-          <div
-            className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors ${
-              step.id < currentStep
-                ? "bg-[#C9A962] text-white"
-                : step.id === currentStep
-                ? "bg-[#2D2D2D] text-white"
-                : "bg-[#E8E0D4] text-[#999]"
-            }`}
-          >
-            {step.id < currentStep ? (
-              <Check className="w-4 h-4" />
-            ) : (
-              step.id
-            )}
+          <div className="flex flex-col items-center">
+            <div
+              className={`w-10 h-10 flex items-center justify-center text-sm font-medium transition-all ${
+                step.id < currentStep
+                  ? "bg-[var(--color-gold)] text-white"
+                  : step.id === currentStep
+                  ? "bg-[var(--color-charcoal)] text-white"
+                  : "bg-[var(--color-beige)] text-[var(--color-text-muted)]"
+              }`}
+            >
+              {step.id < currentStep ? (
+                <Check className="w-5 h-5" />
+              ) : (
+                step.id
+              )}
+            </div>
+            <span className={`mt-2 text-xs hidden md:block ${
+              step.id <= currentStep ? "text-[var(--color-charcoal)]" : "text-[var(--color-text-muted)]"
+            }`}>
+              {step.label}
+            </span>
           </div>
           {index < steps.length - 1 && (
             <div
-              className={`w-12 h-[2px] mx-2 transition-colors ${
-                step.id < currentStep ? "bg-[#C9A962]" : "bg-[#E8E0D4]"
+              className={`w-8 md:w-16 h-[2px] mx-1 md:mx-2 transition-colors ${
+                step.id < currentStep ? "bg-[var(--color-gold)]" : "bg-[var(--color-beige-dark)]"
               }`}
             />
           )}
@@ -60,7 +68,6 @@ function StepProgress({ currentStep }: { currentStep: number }) {
   );
 }
 
-// Calendar Component
 function BookingCalendar({
   selectedDate,
   onSelectDate,
@@ -73,8 +80,6 @@ function BookingCalendar({
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
   const days = eachDayOfInterval({ start: monthStart, end: monthEnd });
-
-  // Get day of week for first day (0 = Sunday)
   const startDay = monthStart.getDay();
 
   const prevMonth = () => {
@@ -94,33 +99,31 @@ function BookingCalendar({
   };
 
   return (
-    <div className="bg-white border border-[#E8E0D4] p-6">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+    <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-6 md:p-8">
+      <div className="flex items-center justify-between mb-8">
         <button
           onClick={prevMonth}
-          className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
+          className="w-10 h-10 flex items-center justify-center hover:bg-[var(--color-beige)] transition-colors"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h3 className="font-display text-xl">
+        <h3 className="font-display text-xl text-[var(--color-charcoal)]">
           {format(currentMonth, "yyyy년 M월", { locale: ko })}
         </h3>
         <button
           onClick={nextMonth}
-          className="p-2 hover:bg-[#F5F0E8] rounded-full transition-colors"
+          className="w-10 h-10 flex items-center justify-center hover:bg-[var(--color-beige)] transition-colors"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Days of Week */}
-      <div className="grid grid-cols-7 mb-2">
+      <div className="grid grid-cols-7 mb-4">
         {["일", "월", "화", "수", "목", "금", "토"].map((day, index) => (
           <div
             key={day}
             className={`text-center text-sm font-medium py-2 ${
-              index === 0 ? "text-[#C75D5D]" : index === 6 ? "text-[#5D8AC7]" : "text-[#666]"
+              index === 0 ? "text-[#C75D5D]" : index === 6 ? "text-[#5D8AC7]" : "text-[var(--color-text-secondary)]"
             }`}
           >
             {day}
@@ -128,14 +131,11 @@ function BookingCalendar({
         ))}
       </div>
 
-      {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1">
-        {/* Empty cells for start day offset */}
         {[...Array(startDay)].map((_, i) => (
           <div key={`empty-${i}`} className="aspect-square" />
         ))}
 
-        {/* Days */}
         {days.map((day) => {
           const disabled = isDisabled(day);
           const selected = isSelected(day);
@@ -149,16 +149,16 @@ function BookingCalendar({
               disabled={disabled}
               className={`aspect-square flex items-center justify-center text-sm transition-all ${
                 disabled
-                  ? "text-[#E8E0D4] cursor-not-allowed"
+                  ? "text-[var(--color-beige-dark)] cursor-not-allowed"
                   : selected
-                  ? "bg-[#C9A962] text-white"
+                  ? "bg-[var(--color-gold)] text-white font-medium"
                   : today
-                  ? "bg-[#F5F0E8] text-[#2D2D2D] font-medium"
+                  ? "bg-[var(--color-beige)] text-[var(--color-charcoal)] font-medium"
                   : dayOfWeek === 0
-                  ? "text-[#C75D5D] hover:bg-[#F5F0E8]"
+                  ? "text-[#C75D5D] hover:bg-[var(--color-beige)]"
                   : dayOfWeek === 6
-                  ? "text-[#5D8AC7] hover:bg-[#F5F0E8]"
-                  : "text-[#2D2D2D] hover:bg-[#F5F0E8]"
+                  ? "text-[#5D8AC7] hover:bg-[var(--color-beige)]"
+                  : "text-[var(--color-charcoal)] hover:bg-[var(--color-beige)]"
               }`}
             >
               {format(day, "d")}
@@ -170,7 +170,6 @@ function BookingCalendar({
   );
 }
 
-// Time Slots Component
 function TimeSlots({
   selectedTime,
   onSelectTime,
@@ -192,8 +191,8 @@ function TimeSlots({
   ];
 
   return (
-    <div className="bg-white border border-[#E8E0D4] p-6">
-      <h3 className="font-display text-lg mb-4">시간 선택</h3>
+    <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-6 md:p-8">
+      <h3 className="font-display text-lg text-[var(--color-charcoal)] mb-6">시간 선택</h3>
       <div className="grid grid-cols-5 gap-2">
         {timeSlots.map((slot) => (
           <button
@@ -202,21 +201,23 @@ function TimeSlots({
             disabled={!slot.available}
             className={`py-3 text-sm font-medium transition-all ${
               !slot.available
-                ? "bg-[#F5F0E8] text-[#999] cursor-not-allowed line-through"
+                ? "bg-[var(--color-beige)] text-[var(--color-text-muted)] cursor-not-allowed line-through"
                 : selectedTime === slot.time
-                ? "bg-[#C9A962] text-white"
-                : "border border-[#E8E0D4] hover:border-[#C9A962] hover:text-[#C9A962]"
+                ? "bg-[var(--color-gold)] text-white"
+                : "border border-[var(--color-beige-dark)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
             }`}
           >
             {slot.time}
           </button>
         ))}
       </div>
+      <p className="mt-4 text-xs text-[var(--color-text-muted)]">
+        * 취소선이 있는 시간은 예약이 마감된 시간입니다
+      </p>
     </div>
   );
 }
 
-// Step 1: Schedule Selection
 function ScheduleStep({
   selectedDate,
   selectedTime,
@@ -233,11 +234,10 @@ function ScheduleStep({
   const canProceed = selectedDate && selectedTime;
 
   return (
-    <div className="grid lg:grid-cols-3 gap-6">
-      {/* Product Summary */}
-      <div className="lg:col-span-1">
-        <div className="bg-white border border-[#E8E0D4] p-6 sticky top-24">
-          <div className="relative aspect-video mb-4">
+    <div className="grid lg:grid-cols-3 gap-8">
+      <div className="lg:col-span-1 order-2 lg:order-1">
+        <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] sticky top-24">
+          <div className="relative aspect-video">
             <Image
               src="https://images.unsplash.com/photo-1519741497674-611481863552?w=800&q=80"
               alt="스튜디오"
@@ -245,29 +245,30 @@ function ScheduleStep({
               className="object-cover"
             />
           </div>
-          <p className="text-[11px] uppercase tracking-wider text-[#C9A962] mb-1">
-            프로필
-          </p>
-          <h3 className="font-display text-xl mb-2">루미에르 스튜디오</h3>
-          <p className="text-[#666] text-sm mb-4">프로필 A코스</p>
-          <div className="border-t border-[#E8E0D4] pt-4">
-            <div className="flex items-center gap-4 text-sm text-[#666] mb-2">
-              <div className="flex items-center gap-1">
-                <Clock className="w-4 h-4" />
-                <span>60분</span>
+          <div className="p-6">
+            <p className="text-[11px] uppercase tracking-wider text-[var(--color-gold)] font-medium mb-1">
+              프로필
+            </p>
+            <h3 className="font-display text-xl text-[var(--color-charcoal)] mb-2">루미에르 스튜디오</h3>
+            <p className="text-[var(--color-text-secondary)] text-sm mb-4">프로필 A코스</p>
+            <div className="border-t border-[var(--color-beige-dark)] pt-4">
+              <div className="flex items-center gap-4 text-sm text-[var(--color-text-secondary)] mb-3">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-[var(--color-gold)]" />
+                  <span>60분</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Users className="w-4 h-4 text-[var(--color-gold)]" />
+                  <span>1인 기준</span>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <Users className="w-4 h-4" />
-                <span>1인 기준</span>
-              </div>
+              <p className="text-2xl font-medium text-[var(--color-gold)]">45,000원</p>
             </div>
-            <p className="text-xl font-medium text-[#C9A962]">45,000원</p>
           </div>
         </div>
       </div>
 
-      {/* Calendar & Time */}
-      <div className="lg:col-span-2 space-y-6">
+      <div className="lg:col-span-2 space-y-6 order-1 lg:order-2">
         <BookingCalendar selectedDate={selectedDate} onSelectDate={onSelectDate} />
         <TimeSlots selectedTime={selectedTime} onSelectTime={onSelectTime} />
 
@@ -277,7 +278,7 @@ function ScheduleStep({
           className={`w-full py-4 text-sm font-medium uppercase tracking-wider transition-all ${
             canProceed
               ? "btn-gold"
-              : "bg-[#E8E0D4] text-[#999] cursor-not-allowed"
+              : "bg-[var(--color-beige)] text-[var(--color-text-muted)] cursor-not-allowed"
           }`}
         >
           다음 단계
@@ -287,7 +288,6 @@ function ScheduleStep({
   );
 }
 
-// Step 2: Options Selection
 function OptionsStep({
   selectedOptions,
   onToggleOption,
@@ -300,7 +300,7 @@ function OptionsStep({
   onBack: () => void;
 }) {
   const options = [
-    { id: "makeup", name: "헤어메이크업", price: 30000, description: "전문 아티스트의 헤어 & 메이크업 서비스" },
+    { id: "makeup", name: "헤어메이크업", price: 30000, description: "전문 아티스트의 헤어 & 메이크업 서비스", popular: true },
     { id: "costume", name: "의상 대여", price: 20000, description: "다양한 스타일의 의상 1벌 선택" },
     { id: "retouching", name: "추가 보정 10장", price: 15000, description: "추가 보정본 10장 제공" },
     { id: "print", name: "사진 인화 (5x7) 5장", price: 10000, description: "고급 용지 인화 5장" },
@@ -312,42 +312,55 @@ function OptionsStep({
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="font-display text-2xl text-center mb-8">추가 옵션 선택</h2>
+      <div className="text-center mb-10">
+        <h2 className="font-display text-3xl text-[var(--color-charcoal)] mb-2">추가 옵션 선택</h2>
+        <p className="text-[var(--color-text-secondary)]">원하시는 옵션을 선택해주세요</p>
+      </div>
 
-      <div className="space-y-4 mb-8">
+      <div className="space-y-4 mb-10">
         {options.map((option) => {
           const isSelected = selectedOptions.includes(option.id);
           return (
-            <button
+            <motion.button
               key={option.id}
               onClick={() => onToggleOption(option.id)}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               className={`w-full p-6 text-left transition-all border ${
                 isSelected
-                  ? "border-[#C9A962] bg-[#FAF8F5]"
-                  : "border-[#E8E0D4] hover:border-[#C9A962]"
+                  ? "border-[var(--color-gold)] bg-[var(--color-beige)]/30"
+                  : "border-[var(--color-beige-dark)] hover:border-[var(--color-gold)]"
               }`}
             >
               <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="font-medium text-[#2D2D2D] mb-1">{option.name}</h3>
-                  <p className="text-sm text-[#666]">{option.description}</p>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="font-medium text-[var(--color-charcoal)]">{option.name}</h3>
+                    {option.popular && (
+                      <span className="badge badge-gold text-[10px]">
+                        <Sparkles className="w-3 h-3 mr-1" />
+                        인기
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-sm text-[var(--color-text-secondary)]">{option.description}</p>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="font-medium text-[#C9A962]">
+                <div className="flex items-center gap-4 ml-4">
+                  <span className="font-medium text-[var(--color-gold)]">
                     +{formatPrice(option.price)}원
                   </span>
                   <div
-                    className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+                    className={`w-6 h-6 border-2 flex items-center justify-center transition-colors ${
                       isSelected
-                        ? "bg-[#C9A962] border-[#C9A962]"
-                        : "border-[#E8E0D4]"
+                        ? "bg-[var(--color-gold)] border-[var(--color-gold)]"
+                        : "border-[var(--color-beige-dark)]"
                     }`}
                   >
                     {isSelected && <Check className="w-4 h-4 text-white" />}
                   </div>
                 </div>
               </div>
-            </button>
+            </motion.button>
           );
         })}
       </div>
@@ -355,7 +368,7 @@ function OptionsStep({
       <div className="flex gap-4">
         <button
           onClick={onBack}
-          className="flex-1 py-4 border border-[#E8E0D4] text-sm font-medium uppercase tracking-wider hover:border-[#2D2D2D] transition-colors"
+          className="flex-1 py-4 border border-[var(--color-beige-dark)] text-sm font-medium uppercase tracking-wider hover:border-[var(--color-charcoal)] transition-colors"
         >
           이전
         </button>
@@ -367,7 +380,6 @@ function OptionsStep({
   );
 }
 
-// Step 3: Information Input
 function InfoStep({
   formData,
   onUpdateForm,
@@ -393,9 +405,12 @@ function InfoStep({
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="font-display text-2xl text-center mb-8">예약자 정보</h2>
+      <div className="text-center mb-10">
+        <h2 className="font-display text-3xl text-[var(--color-charcoal)] mb-2">예약자 정보</h2>
+        <p className="text-[var(--color-text-secondary)]">정확한 정보를 입력해주세요</p>
+      </div>
 
-      <div className="bg-white border border-[#E8E0D4] p-6 mb-6">
+      <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-8 mb-6">
         <div className="space-y-6">
           <div>
             <label className="form-label">
@@ -444,8 +459,7 @@ function InfoStep({
         </div>
       </div>
 
-      {/* Agreements */}
-      <div className="bg-white border border-[#E8E0D4] p-6 mb-8">
+      <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-8 mb-10">
         <div className="space-y-4">
           <label className="checkbox-custom">
             <input
@@ -458,7 +472,7 @@ function InfoStep({
               }}
             />
             <span className="text-sm">
-              <span className="text-[#C75D5D]">[필수]</span> 이용약관에 동의합니다
+              <span className="text-[#C75D5D] font-medium">[필수]</span> 이용약관에 동의합니다
             </span>
           </label>
           <label className="checkbox-custom">
@@ -472,7 +486,7 @@ function InfoStep({
               }}
             />
             <span className="text-sm">
-              <span className="text-[#C75D5D]">[필수]</span> 개인정보 수집 및 이용에 동의합니다
+              <span className="text-[#C75D5D] font-medium">[필수]</span> 개인정보 수집 및 이용에 동의합니다
             </span>
           </label>
           <label className="checkbox-custom">
@@ -485,7 +499,7 @@ function InfoStep({
                 onUpdateForm("agreements", newAgreements);
               }}
             />
-            <span className="text-sm text-[#666]">
+            <span className="text-sm text-[var(--color-text-secondary)]">
               [선택] 마케팅 정보 수신에 동의합니다
             </span>
           </label>
@@ -495,7 +509,7 @@ function InfoStep({
       <div className="flex gap-4">
         <button
           onClick={onBack}
-          className="flex-1 py-4 border border-[#E8E0D4] text-sm font-medium uppercase tracking-wider hover:border-[#2D2D2D] transition-colors"
+          className="flex-1 py-4 border border-[var(--color-beige-dark)] text-sm font-medium uppercase tracking-wider hover:border-[var(--color-charcoal)] transition-colors"
         >
           이전
         </button>
@@ -505,7 +519,7 @@ function InfoStep({
           className={`flex-1 py-4 text-sm font-medium uppercase tracking-wider transition-all ${
             canProceed
               ? "btn-gold"
-              : "bg-[#E8E0D4] text-[#999] cursor-not-allowed"
+              : "bg-[var(--color-beige)] text-[var(--color-text-muted)] cursor-not-allowed"
           }`}
         >
           다음 단계
@@ -515,7 +529,6 @@ function InfoStep({
   );
 }
 
-// Step 4: Payment
 function PaymentStep({
   onNext,
   onBack,
@@ -526,10 +539,10 @@ function PaymentStep({
   const [paymentMethod, setPaymentMethod] = useState("");
 
   const paymentMethods = [
-    { id: "card", label: "신용/체크카드" },
-    { id: "kakao", label: "카카오페이" },
-    { id: "toss", label: "토스페이" },
-    { id: "naver", label: "네이버페이" },
+    { id: "card", label: "신용/체크카드", icon: "💳" },
+    { id: "kakao", label: "카카오페이", icon: "🟡" },
+    { id: "toss", label: "토스페이", icon: "🔵" },
+    { id: "naver", label: "네이버페이", icon: "🟢" },
   ];
 
   const formatPrice = (price: number) => {
@@ -538,89 +551,94 @@ function PaymentStep({
 
   return (
     <div className="max-w-2xl mx-auto">
-      <h2 className="font-display text-2xl text-center mb-8">결제</h2>
+      <div className="text-center mb-10">
+        <h2 className="font-display text-3xl text-[var(--color-charcoal)] mb-2">결제</h2>
+        <p className="text-[var(--color-text-secondary)]">예약 정보를 확인하고 결제해주세요</p>
+      </div>
 
-      {/* Order Summary */}
-      <div className="bg-white border border-[#E8E0D4] p-6 mb-6">
-        <h3 className="font-medium text-[#2D2D2D] mb-4">예약 정보</h3>
+      <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-8 mb-6">
+        <h3 className="font-medium text-[var(--color-charcoal)] mb-4 pb-4 border-b border-[var(--color-beige)]">예약 정보</h3>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-[#666]">예약 상품</span>
-            <span>프로필 A코스</span>
+            <span className="text-[var(--color-text-secondary)]">예약 상품</span>
+            <span className="font-medium">프로필 A코스</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#666]">예약 일시</span>
-            <span>2024.01.20 (토) 14:00</span>
+            <span className="text-[var(--color-text-secondary)]">예약 일시</span>
+            <span className="font-medium">2024.01.20 (토) 14:00</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#666]">추가 옵션</span>
-            <span>헤어메이크업</span>
+            <span className="text-[var(--color-text-secondary)]">추가 옵션</span>
+            <span className="font-medium">헤어메이크업</span>
           </div>
         </div>
       </div>
 
-      {/* Price Summary */}
-      <div className="bg-white border border-[#E8E0D4] p-6 mb-6">
-        <h3 className="font-medium text-[#2D2D2D] mb-4">결제 금액</h3>
+      <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-8 mb-6">
+        <h3 className="font-medium text-[var(--color-charcoal)] mb-4 pb-4 border-b border-[var(--color-beige)]">결제 금액</h3>
         <div className="space-y-3 text-sm">
           <div className="flex justify-between">
-            <span className="text-[#666]">상품 금액</span>
+            <span className="text-[var(--color-text-secondary)]">상품 금액</span>
             <span>{formatPrice(50000)}원</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#666]">쿠폰 할인</span>
+            <span className="text-[var(--color-text-secondary)]">쿠폰 할인</span>
             <span className="text-[#C75D5D]">-{formatPrice(5000)}원</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-[#666]">추가 옵션</span>
+            <span className="text-[var(--color-text-secondary)]">추가 옵션</span>
             <span>+{formatPrice(30000)}원</span>
           </div>
-          <div className="border-t border-[#E8E0D4] pt-3 mt-3">
-            <div className="flex justify-between text-lg font-medium">
-              <span>총 결제 금액</span>
-              <span className="text-[#C9A962]">{formatPrice(75000)}원</span>
+          <div className="border-t border-[var(--color-beige)] pt-4 mt-4">
+            <div className="flex justify-between text-lg">
+              <span className="font-medium">총 결제 금액</span>
+              <span className="font-medium text-[var(--color-gold)]">{formatPrice(75000)}원</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Payment Method */}
-      <div className="bg-white border border-[#E8E0D4] p-6 mb-8">
-        <h3 className="font-medium text-[#2D2D2D] mb-4">결제 수단</h3>
+      <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-8 mb-10">
+        <h3 className="font-medium text-[var(--color-charcoal)] mb-4 pb-4 border-b border-[var(--color-beige)]">결제 수단</h3>
         <div className="grid grid-cols-2 gap-3">
           {paymentMethods.map((method) => (
             <button
               key={method.id}
               onClick={() => setPaymentMethod(method.id)}
-              className={`py-4 text-sm font-medium transition-all border ${
+              className={`py-4 text-sm font-medium transition-all border flex items-center justify-center gap-2 ${
                 paymentMethod === method.id
-                  ? "border-[#C9A962] bg-[#FAF8F5] text-[#C9A962]"
-                  : "border-[#E8E0D4] hover:border-[#C9A962]"
+                  ? "border-[var(--color-gold)] bg-[var(--color-beige)]/30 text-[var(--color-gold)]"
+                  : "border-[var(--color-beige-dark)] hover:border-[var(--color-gold)]"
               }`}
             >
+              <span>{method.icon}</span>
               {method.label}
             </button>
           ))}
+        </div>
+        <div className="flex items-center gap-2 mt-4 text-xs text-[var(--color-text-muted)]">
+          <Shield className="w-4 h-4" />
+          안전한 결제를 위해 SSL 암호화를 사용합니다
         </div>
       </div>
 
       <div className="flex gap-4">
         <button
           onClick={onBack}
-          className="flex-1 py-4 border border-[#E8E0D4] text-sm font-medium uppercase tracking-wider hover:border-[#2D2D2D] transition-colors"
+          className="flex-1 py-4 border border-[var(--color-beige-dark)] text-sm font-medium uppercase tracking-wider hover:border-[var(--color-charcoal)] transition-colors"
         >
           이전
         </button>
         <button
           onClick={onNext}
           disabled={!paymentMethod}
-          className={`flex-1 py-4 text-sm font-medium uppercase tracking-wider transition-all ${
+          className={`flex-1 py-4 text-sm font-medium uppercase tracking-wider transition-all flex items-center justify-center gap-2 ${
             paymentMethod
               ? "btn-gold"
-              : "bg-[#E8E0D4] text-[#999] cursor-not-allowed"
+              : "bg-[var(--color-beige)] text-[var(--color-text-muted)] cursor-not-allowed"
           }`}
         >
-          <CreditCard className="w-4 h-4 inline mr-2" />
+          <CreditCard className="w-4 h-4" />
           {formatPrice(75000)}원 결제하기
         </button>
       </div>
@@ -628,7 +646,6 @@ function PaymentStep({
   );
 }
 
-// Step 5: Complete
 function CompleteStep() {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR").format(price);
@@ -640,9 +657,9 @@ function CompleteStep() {
         initial={{ scale: 0 }}
         animate={{ scale: 1 }}
         transition={{ type: "spring", duration: 0.5 }}
-        className="w-20 h-20 mx-auto mb-6 rounded-full bg-[#4A7C59] flex items-center justify-center"
+        className="w-24 h-24 mx-auto mb-8 rounded-full bg-gradient-to-br from-[#4A7C59] to-[#3d6549] flex items-center justify-center shadow-lg"
       >
-        <CheckCircle2 className="w-10 h-10 text-white" />
+        <CheckCircle2 className="w-12 h-12 text-white" />
       </motion.div>
 
       <motion.div
@@ -650,10 +667,10 @@ function CompleteStep() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <h2 className="font-display text-3xl text-[#2D2D2D] mb-2">
+        <h2 className="font-display text-4xl text-[var(--color-charcoal)] mb-3">
           예약이 완료되었습니다
         </h2>
-        <p className="text-[#666] mb-8">
+        <p className="text-[var(--color-text-secondary)] mb-10">
           예약 확인 메일이 발송되었습니다
         </p>
       </motion.div>
@@ -662,37 +679,37 @@ function CompleteStep() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="bg-white border border-[#E8E0D4] p-8 mb-8 text-left"
+        className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-10 mb-10 text-left"
       >
-        <div className="text-center mb-6">
-          <p className="text-sm text-[#666] mb-1">예약번호</p>
-          <p className="font-display text-2xl text-[#C9A962]">PP-2024012012345</p>
+        <div className="text-center mb-8 pb-8 border-b border-[var(--color-beige)]">
+          <p className="text-sm text-[var(--color-text-secondary)] mb-2">예약번호</p>
+          <p className="font-display text-3xl text-[var(--color-gold)]">PP-2024012012345</p>
         </div>
 
-        <div className="space-y-4 text-sm">
-          <div className="flex justify-between py-3 border-b border-[#F5F0E8]">
-            <span className="text-[#666]">스튜디오</span>
+        <div className="space-y-0 text-sm">
+          <div className="flex justify-between py-4 border-b border-[var(--color-beige)]">
+            <span className="text-[var(--color-text-secondary)]">스튜디오</span>
             <span className="font-medium">루미에르 스튜디오</span>
           </div>
-          <div className="flex justify-between py-3 border-b border-[#F5F0E8]">
-            <span className="text-[#666]">상품</span>
+          <div className="flex justify-between py-4 border-b border-[var(--color-beige)]">
+            <span className="text-[var(--color-text-secondary)]">상품</span>
             <span className="font-medium">프로필 A코스 + 헤어메이크업</span>
           </div>
-          <div className="flex justify-between py-3 border-b border-[#F5F0E8]">
-            <span className="text-[#666]">예약 일시</span>
+          <div className="flex justify-between py-4 border-b border-[var(--color-beige)]">
+            <span className="text-[var(--color-text-secondary)]">예약 일시</span>
             <span className="font-medium">2024.01.20 (토) 14:00</span>
           </div>
-          <div className="flex justify-between py-3 border-b border-[#F5F0E8]">
-            <span className="text-[#666]">예약자</span>
+          <div className="flex justify-between py-4 border-b border-[var(--color-beige)]">
+            <span className="text-[var(--color-text-secondary)]">예약자</span>
             <span className="font-medium">홍길동</span>
           </div>
-          <div className="flex justify-between py-3 border-b border-[#F5F0E8]">
-            <span className="text-[#666]">연락처</span>
+          <div className="flex justify-between py-4 border-b border-[var(--color-beige)]">
+            <span className="text-[var(--color-text-secondary)]">연락처</span>
             <span className="font-medium">010-1234-5678</span>
           </div>
-          <div className="flex justify-between py-3">
-            <span className="text-[#666]">결제 금액</span>
-            <span className="font-medium text-[#C9A962]">{formatPrice(75000)}원</span>
+          <div className="flex justify-between py-4">
+            <span className="text-[var(--color-text-secondary)]">결제 금액</span>
+            <span className="font-medium text-[var(--color-gold)]">{formatPrice(75000)}원</span>
           </div>
         </div>
       </motion.div>
@@ -701,7 +718,7 @@ function CompleteStep() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="text-sm text-[#999] mb-8"
+        className="text-sm text-[var(--color-text-muted)] mb-10"
       >
         문의사항은 스튜디오에 직접 연락해주세요
       </motion.p>
@@ -715,10 +732,7 @@ function CompleteStep() {
         <Link href="/mypage/bookings" className="btn-gold">
           예약 내역 보기
         </Link>
-        <Link
-          href="/"
-          className="btn-outline"
-        >
+        <Link href="/" className="btn-outline">
           홈으로
         </Link>
       </motion.div>
@@ -755,23 +769,20 @@ export default function BookingPage() {
   const prevStep = () => setCurrentStep((prev) => Math.max(prev - 1, 1));
 
   return (
-    <div className="min-h-screen bg-[#FAFAF8] pt-20">
-      <div className="container-wide py-8">
-        {/* Back Button */}
+    <div className="min-h-screen bg-[var(--color-ivory)] pt-20">
+      <div className="container-wide py-10">
         {currentStep < 5 && (
           <Link
             href="/studio/studio-1"
-            className="inline-flex items-center gap-2 text-[#666] hover:text-[#2D2D2D] transition-colors mb-8"
+            className="inline-flex items-center gap-2 text-[var(--color-text-secondary)] hover:text-[var(--color-charcoal)] transition-colors mb-10"
           >
             <ArrowLeft className="w-4 h-4" />
             스튜디오로 돌아가기
           </Link>
         )}
 
-        {/* Step Progress */}
         <StepProgress currentStep={currentStep} />
 
-        {/* Step Content */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
