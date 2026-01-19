@@ -58,7 +58,7 @@ export default function CTASection() {
           </Link>
           <Link
             href="/partner/apply"
-            className="btn-outline border-white/40 text-white hover:bg-white hover:text-[var(--color-charcoal)] btn-lg backdrop-blur-sm"
+            className="btn-lg bg-white text-[var(--color-charcoal)] hover:bg-[var(--color-beige)] transition-colors"
           >
             스튜디오 입점 신청
           </Link>

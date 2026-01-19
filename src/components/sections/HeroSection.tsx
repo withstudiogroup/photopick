@@ -80,11 +80,11 @@ export default function HeroSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="font-display text-5xl md:text-7xl lg:text-[5.5rem] font-light mb-8 leading-[1.05] drop-shadow-2xl text-warm-gray-force"
+          className="font-display-kr text-4xl md:text-5xl lg:text-6xl mb-8 leading-[1.2] drop-shadow-2xl text-white-force"
         >
           당신의 특별한 순간을
           <br />
-          <span className="italic text-gold-force drop-shadow-lg">담아드립니다</span>
+          <span className="text-gold-force">담아드립니다</span>
         </motion.h1>
 
         <motion.p
