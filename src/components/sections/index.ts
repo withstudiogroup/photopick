@@ -1,0 +1,9 @@
+export { default as HeroSection } from "./HeroSection";
+export { default as EventSection } from "./EventSection";
+export { default as CategoriesSection } from "./CategoriesSection";
+export { default as FeaturedSection } from "./FeaturedSection";
+export { default as PickSection } from "./PickSection";
+export { default as DealSection } from "./DealSection";
+export { default as ReviewsSection } from "./ReviewsSection";
+export { default as RegionsSection } from "./RegionsSection";
+export { default as CTASection } from "./CTASection";
