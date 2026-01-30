@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // SSR mode (no output: export)
   basePath: '/photopick',
   images: {
     unoptimized: true,
