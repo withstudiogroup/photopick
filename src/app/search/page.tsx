@@ -32,7 +32,7 @@ function PriceRangeSlider() {
 
   return (
     <div className="filter-section">
-      <h4 className="filter-title">가격</h4>
+      <h4 className="filter-title" id="price-filter-label">가격</h4>
       <div className="space-y-4">
         <div className="flex items-center justify-between text-sm">
           <span className="text-[var(--color-text-muted)]">{formatPrice(minPrice)}</span>
@@ -46,6 +46,11 @@ function PriceRangeSlider() {
           value={maxPrice}
           onChange={(e) => setMaxPrice(Number(e.target.value))}
           className="range-slider"
+          aria-label="최대 가격 설정"
+          aria-valuemin={0}
+          aria-valuemax={500000}
+          aria-valuenow={maxPrice}
+          aria-labelledby="price-filter-label"
         />
       </div>
     </div>
@@ -73,13 +78,20 @@ function FilterSidebar({
   return (
     <>
       {isOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={onClose}
-        />
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={onClose}
+          />
+          <style jsx global>{`
+            body {
+              overflow: hidden;
+            }
+          `}</style>
+        </>
       )}
 
       <aside
@@ -109,17 +121,17 @@ function FilterSidebar({
           <div className="lg:bg-[var(--color-white)] lg:border lg:border-[var(--color-beige-dark)] lg:p-6">
             <div className="filter-section border-t-0 pt-0">
               <label className="checkbox-custom">
-                <input type="checkbox" />
+                <input type="checkbox" id="filter-available-only" />
                 <span className="text-sm">예약 불가 스튜디오 제외</span>
               </label>
             </div>
 
             <div className="filter-section">
               <h4 className="filter-title">촬영 유형</h4>
-              <div className="space-y-3">
+              <div className="space-y-3" role="radiogroup" aria-label="촬영 유형 선택">
                 {categories.map((cat) => (
                   <label key={cat.id} className="radio-custom">
-                    <input type="radio" name="category" />
+                    <input type="radio" name="category" id={`category-${cat.id}`} />
                     <span className="text-sm text-[var(--color-text-secondary)]">{cat.label}</span>
                   </label>
                 ))}
@@ -147,7 +159,7 @@ function FilterSidebar({
               <div className="space-y-3">
                 {facilities.slice(0, 6).map((facility) => (
                   <label key={facility.id} className="checkbox-custom">
-                    <input type="checkbox" />
+                    <input type="checkbox" id={`facility-${facility.id}`} />
                     <span className="text-sm text-[var(--color-text-secondary)]">
                       {facility.icon} {facility.label}
                     </span>
@@ -158,10 +170,10 @@ function FilterSidebar({
 
             <div className="filter-section">
               <h4 className="filter-title">평점</h4>
-              <div className="space-y-3">
-                {["4.5점 이상", "4.0점 이상", "3.5점 이상"].map((rating) => (
+              <div className="space-y-3" role="radiogroup" aria-label="평점 필터">
+                {["4.5점 이상", "4.0점 이상", "3.5점 이상"].map((rating, idx) => (
                   <label key={rating} className="radio-custom">
-                    <input type="radio" name="rating" />
+                    <input type="radio" name="rating" id={`rating-${idx}`} />
                     <span className="text-sm text-[var(--color-text-secondary)]">{rating}</span>
                   </label>
                 ))}
@@ -172,11 +184,11 @@ function FilterSidebar({
               <h4 className="filter-title">예약 유형</h4>
               <div className="space-y-3">
                 <label className="checkbox-custom">
-                  <input type="checkbox" />
+                  <input type="checkbox" id="filter-instant-booking" />
                   <span className="text-sm text-[var(--color-text-secondary)]">즉시예약 가능</span>
                 </label>
                 <label className="checkbox-custom">
-                  <input type="checkbox" />
+                  <input type="checkbox" id="filter-same-day" />
                   <span className="text-sm text-[var(--color-text-secondary)]">당일예약 가능</span>
                 </label>
               </div>
@@ -247,12 +259,14 @@ function ViewToggle({
   setView: (view: "list" | "grid") => void;
 }) {
   return (
-    <div className="hidden md:flex items-center border border-[var(--color-beige-dark)]">
+    <div className="hidden md:flex items-center border border-[var(--color-beige-dark)]" role="group" aria-label="보기 방식 선택">
       <button
         onClick={() => setView("list")}
         className={`p-2.5 transition-colors ${
           view === "list" ? "bg-[var(--color-charcoal)] text-white" : "hover:bg-[var(--color-beige)]"
         }`}
+        aria-label="리스트 보기"
+        aria-pressed={view === "list"}
       >
         <LayoutList className="w-4 h-4" />
       </button>
@@ -261,6 +275,8 @@ function ViewToggle({
         className={`p-2.5 transition-colors ${
           view === "grid" ? "bg-[var(--color-charcoal)] text-white" : "hover:bg-[var(--color-beige)]"
         }`}
+        aria-label="그리드 보기"
+        aria-pressed={view === "grid"}
       >
         <Grid3X3 className="w-4 h-4" />
       </button>
@@ -310,6 +326,8 @@ function StudioCardHorizontal({ studio, index }: { studio: typeof studios[0]; in
             setIsWishlisted(!isWishlisted);
           }}
           className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label={isWishlisted ? "찜 취소" : "찜하기"}
+          aria-pressed={isWishlisted}
         >
           <Heart
             className={`w-4 h-4 ${
@@ -420,6 +438,8 @@ function StudioCardGrid({ studio, index }: { studio: typeof studios[0]; index: n
             setIsWishlisted(!isWishlisted);
           }}
           className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:scale-110 transition-transform"
+          aria-label={isWishlisted ? "찜 취소" : "찜하기"}
+          aria-pressed={isWishlisted}
         >
           <Heart
             className={`w-4 h-4 ${
@@ -492,15 +512,18 @@ export default function SearchPage() {
 
             <div className="search-box p-1.5 flex flex-col md:flex-row gap-2">
               <div className="flex-1 relative">
+                <label htmlFor="search-input" className="sr-only">스튜디오 검색</label>
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-gold)]" />
                 <input
+                  id="search-input"
                   type="text"
                   placeholder="지역, 스튜디오명으로 검색"
                   defaultValue="강남"
                   className="w-full pl-12 pr-4 py-3.5 bg-transparent text-[var(--color-charcoal)] text-[15px] outline-none placeholder:text-[var(--color-text-muted)]"
+                  aria-label="지역, 스튜디오명으로 검색"
                 />
               </div>
-              <button className="btn-gold md:px-8">검색</button>
+              <button className="btn-gold md:px-8" aria-label="검색 실행">검색</button>
             </div>
           </motion.div>
 
@@ -567,8 +590,11 @@ export default function SearchPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-center gap-1 mt-12">
-              <button className="w-10 h-10 flex items-center justify-center border border-[var(--color-beige-dark)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors">
+            <nav aria-label="페이지 네비게이션" className="flex items-center justify-center gap-1 mt-12">
+              <button 
+                className="w-10 h-10 flex items-center justify-center border border-[var(--color-beige-dark)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors"
+                aria-label="이전 페이지"
+              >
                 &lt;
               </button>
               {[1, 2, 3, 4, 5].map((page) => (
@@ -579,14 +605,19 @@ export default function SearchPage() {
                       ? "bg-[var(--color-charcoal)] text-white"
                       : "border border-[var(--color-beige-dark)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)]"
                   }`}
+                  aria-label={`${page}페이지로 이동`}
+                  aria-current={page === 1 ? "page" : undefined}
                 >
                   {page}
                 </button>
               ))}
-              <button className="w-10 h-10 flex items-center justify-center border border-[var(--color-beige-dark)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors">
+              <button 
+                className="w-10 h-10 flex items-center justify-center border border-[var(--color-beige-dark)] hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors"
+                aria-label="다음 페이지"
+              >
                 &gt;
               </button>
-            </div>
+            </nav>
           </div>
         </div>
       </div>

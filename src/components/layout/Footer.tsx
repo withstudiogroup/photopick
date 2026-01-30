@@ -61,18 +61,19 @@ export default function Footer() {
             {/* Social Links */}
             <div className="flex gap-4">
               {[
-                { icon: Instagram, href: "https://instagram.com" },
-                { icon: Youtube, href: "https://youtube.com" },
-                { icon: MessageCircle, href: "https://pf.kakao.com" },
+                { icon: Instagram, href: "https://instagram.com", label: "인스타그램" },
+                { icon: Youtube, href: "https://youtube.com", label: "유튜브" },
+                { icon: MessageCircle, href: "https://pf.kakao.com", label: "카카오톡" },
               ].map((social, index) => (
                 <a
                   key={index}
                   href={social.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[var(--color-gold)] transition-colors"
+                  aria-label={`${social.label} 팔로우`}
+                  className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-[var(--color-gold)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2 focus:ring-offset-[var(--color-charcoal)]"
                 >
-                  <social.icon className="w-5 h-5" />
+                  <social.icon className="w-5 h-5" aria-hidden="true" />
                 </a>
               ))}
             </div>

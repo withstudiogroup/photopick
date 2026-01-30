@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { motion, useInView } from "framer-motion";
+import { useToast } from "@/components/ui/Toast";
 import {
   Star,
   Heart,
@@ -62,7 +63,7 @@ function ImageGallery({ images }: { images: string[] }) {
             <div className="relative w-full h-full">
               <Image
                 src={img}
-                alt={`Gallery image ${index + 1}`}
+                alt={`스튜디오 인테리어 및 촬영 환경 사진 ${index + 1}`}
                 fill
                 className="object-cover"
               />
@@ -72,11 +73,17 @@ function ImageGallery({ images }: { images: string[] }) {
         ))}
       </Swiper>
 
-      <button className="gallery-main-prev absolute left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-colors">
-        <ChevronLeft className="w-6 h-6 text-[var(--color-charcoal)]" />
+      <button 
+        className="gallery-main-prev absolute left-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-colors"
+        aria-label="이전 이미지"
+      >
+        <ChevronLeft className="w-6 h-6 text-[var(--color-charcoal)]" aria-hidden="true" />
       </button>
-      <button className="gallery-main-next absolute right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-colors">
-        <ChevronRight className="w-6 h-6 text-[var(--color-charcoal)]" />
+      <button 
+        className="gallery-main-next absolute right-6 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-colors"
+        aria-label="다음 이미지"
+      >
+        <ChevronRight className="w-6 h-6 text-[var(--color-charcoal)]" aria-hidden="true" />
       </button>
 
       <div className="absolute bottom-6 right-6 z-10 px-4 py-2 bg-black/60 backdrop-blur-sm text-white text-sm font-medium">
@@ -181,10 +188,13 @@ function ProductCard({
             <button
               onClick={() => setIsExpanded(!isExpanded)}
               className="text-[var(--color-gold)] text-sm font-medium flex items-center gap-1 hover:underline"
+              aria-expanded={isExpanded}
+              aria-controls={`product-details-${product.id}`}
             >
               상세정보
               <ChevronDown
                 className={`w-4 h-4 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                aria-hidden="true"
               />
             </button>
           </div>
@@ -209,6 +219,7 @@ function ProductCard({
 
             {isExpanded && (
               <motion.div
+                id={`product-details-${product.id}`}
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
@@ -355,15 +366,20 @@ function ReviewCard({
         </div>
       )}
 
-      <button className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-gold)] transition-colors">
-        <ThumbsUp className="w-4 h-4" />
-        도움이 됐어요 ({review.helpfulCount})
+      <button 
+        className="flex items-center gap-2 text-sm text-[var(--color-text-muted)] hover:text-[var(--color-gold)] transition-colors"
+        aria-label={`도움이 됐어요 (현재 ${review.helpfulCount}명)`}
+      >
+        <ThumbsUp className="w-4 h-4" aria-hidden="true" />
+        <span aria-live="polite">도움이 됐어요 ({review.helpfulCount})</span>
       </button>
     </motion.div>
   );
 }
 
 function CouponSidebar({ studio }: { studio: typeof studios[0] }) {
+  const toast = useToast();
+  
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("ko-KR").format(price);
   };
@@ -400,7 +416,10 @@ function CouponSidebar({ studio }: { studio: typeof studios[0] }) {
             촬영 5,000원 할인
           </p>
           <p className="text-xs text-[var(--color-text-muted)]">5만원 이상 예약 시 적용</p>
-          <button className="mt-3 w-full py-2.5 bg-[var(--color-gold)] text-white text-sm font-medium hover:bg-[var(--color-gold-dark)] transition-colors">
+          <button 
+            onClick={() => toast.success("쿠폰이 발급되었습니다!")}
+            className="mt-3 w-full py-2.5 bg-[var(--color-gold)] text-white text-sm font-medium hover:bg-[var(--color-gold-dark)] transition-colors"
+          >
             쿠폰 받기
           </button>
         </div>
@@ -504,6 +523,7 @@ export default function StudioDetailPage() {
 
   const [isWishlisted, setIsWishlisted] = useState(false);
   const [activeTab, setActiveTab] = useState("products");
+  const toast = useToast();
 
   const reviewRef = useRef(null);
   const isReviewInView = useInView(reviewRef, { once: true, margin: "-100px" });
@@ -567,6 +587,8 @@ export default function StudioDetailPage() {
                   <button
                     onClick={() => setIsWishlisted(!isWishlisted)}
                     className="w-11 h-11 border border-[var(--color-beige-dark)] flex items-center justify-center hover:border-[var(--color-gold)] transition-colors"
+                    aria-label={isWishlisted ? "찜 취소" : "찜하기"}
+                    aria-pressed={isWishlisted}
                   >
                     <Heart
                       className={`w-5 h-5 ${
@@ -574,10 +596,14 @@ export default function StudioDetailPage() {
                           ? "fill-[var(--color-gold)] text-[var(--color-gold)]"
                           : "text-[var(--color-text-secondary)]"
                       }`}
+                      aria-hidden="true"
                     />
                   </button>
-                  <button className="w-11 h-11 border border-[var(--color-beige-dark)] flex items-center justify-center hover:border-[var(--color-gold)] transition-colors">
-                    <Share2 className="w-5 h-5 text-[var(--color-text-secondary)]" />
+                  <button 
+                    className="w-11 h-11 border border-[var(--color-beige-dark)] flex items-center justify-center hover:border-[var(--color-gold)] transition-colors"
+                    aria-label="공유하기"
+                  >
+                    <Share2 className="w-5 h-5 text-[var(--color-text-secondary)]" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -616,11 +642,14 @@ export default function StudioDetailPage() {
             </motion.div>
 
             <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] mb-8 sticky top-20 z-10">
-              <div className="flex">
+              <div className="flex" role="tablist" aria-label="스튜디오 정보 탭">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
+                    role="tab"
+                    aria-selected={activeTab === tab.id}
+                    aria-controls={`${tab.id}-section`}
                     className={`flex-1 py-4 text-sm font-medium text-center transition-colors border-b-2 ${
                       activeTab === tab.id
                         ? "text-[var(--color-gold)] border-[var(--color-gold)]"
@@ -763,7 +792,13 @@ export default function StudioDetailPage() {
                       </p>
                     </div>
                   </div>
-                  <button className="px-4 py-2 border border-[var(--color-beige-dark)] text-sm hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors">
+                  <button 
+                    onClick={() => {
+                      navigator.clipboard.writeText(studio.address);
+                      toast.success("주소가 복사되었습니다");
+                    }}
+                    className="px-4 py-2 border border-[var(--color-beige-dark)] text-sm hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] transition-colors"
+                  >
                     주소 복사
                   </button>
                 </div>
@@ -791,7 +826,12 @@ export default function StudioDetailPage() {
                     </span>
                   </div>
                 </div>
-                <select className="px-4 py-2.5 border border-[var(--color-beige-dark)] text-sm focus:border-[var(--color-gold)] outline-none transition-colors">
+                <label htmlFor="review-sort" className="sr-only">리뷰 정렬</label>
+                <select 
+                  id="review-sort"
+                  className="px-4 py-2.5 border border-[var(--color-beige-dark)] text-sm focus:border-[var(--color-gold)] outline-none transition-colors"
+                  aria-label="리뷰 정렬 방식 선택"
+                >
                   <option>추천순</option>
                   <option>최신순</option>
                   <option>평점높은순</option>

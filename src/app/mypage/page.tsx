@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   User,
   Calendar,
@@ -20,7 +20,10 @@ import {
   Trash2,
   Camera,
   LogOut,
+  AlertTriangle,
+  X,
 } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
 
 const mockUser = {
   name: "김민지",
@@ -96,7 +99,7 @@ const mockCoupons = [
     name: "신규회원 10% 할인",
     discount: "10%",
     minPrice: 50000,
-    expiry: "2024.03.31",
+    expiry: "2024.01.25",
     isUsed: false,
   },
   {
@@ -147,7 +150,12 @@ function BookingsTab() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="font-display text-2xl text-[var(--color-charcoal)]">예약 내역</h2>
-        <select className="px-4 py-2 border border-[var(--color-beige-dark)] text-sm focus:border-[var(--color-gold)] outline-none transition-colors">
+        <label htmlFor="booking-filter" className="sr-only">예약 상태 필터</label>
+        <select 
+          id="booking-filter"
+          className="px-4 py-2 border border-[var(--color-beige-dark)] text-sm focus:border-[var(--color-gold)] outline-none transition-colors"
+          aria-label="예약 상태 필터"
+        >
           <option>전체</option>
           <option>예약 확정</option>
           <option>촬영 완료</option>
@@ -264,8 +272,12 @@ function WishlistTab() {
                 fill
                 className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
-              <button className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:scale-110 transition-transform">
-                <Heart className="w-4 h-4 fill-[var(--color-gold)] text-[var(--color-gold)]" />
+              <button 
+                className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center hover:scale-110 transition-transform"
+                aria-label="찜 취소"
+                aria-pressed="true"
+              >
+                <Heart className="w-4 h-4 fill-[var(--color-gold)] text-[var(--color-gold)]" aria-hidden="true" />
               </button>
             </Link>
             <div className="p-5">
@@ -318,55 +330,85 @@ function ReviewsTab() {
 }
 
 function CouponsTab() {
+  const getDaysUntilExpiry = (expiryDate: string) => {
+    const today = new Date();
+    const expiry = new Date(expiryDate);
+    const diff = Math.ceil((expiry.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
+
   return (
     <div>
       <h2 className="font-display text-2xl text-[var(--color-charcoal)] mb-6">쿠폰함</h2>
       <div className="space-y-3">
-        {mockCoupons.map((coupon, index) => (
-          <motion.div
-            key={coupon.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className={`relative bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-6 ${
-              coupon.isUsed ? "opacity-50" : ""
-            }`}
-          >
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-[var(--color-ivory)] rounded-r-full" />
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-[var(--color-ivory)] rounded-l-full" />
+        {mockCoupons.map((coupon, index) => {
+          const daysLeft = getDaysUntilExpiry(coupon.expiry);
+          const isExpiringSoon = daysLeft <= 7 && daysLeft >= 0;
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <div className="text-center pr-6 border-r border-dashed border-[var(--color-beige-dark)]">
-                  <p className="text-2xl font-medium text-[var(--color-gold)]">{coupon.discount}</p>
-                  <p className="text-xs text-[var(--color-text-muted)] mt-1">할인</p>
+          return (
+            <motion.div
+              key={coupon.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+              className={`relative bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-6 ${
+                coupon.isUsed ? "opacity-50" : ""
+              }`}
+            >
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-[var(--color-ivory)] rounded-r-full" />
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-8 bg-[var(--color-ivory)] rounded-l-full" />
+
+              {isExpiringSoon && !coupon.isUsed && (
+                <div className="absolute -top-2 left-6 bg-[#C75D5D] text-white text-[10px] px-2 py-0.5 font-medium flex items-center gap-1">
+                  <AlertTriangle className="w-3 h-3" aria-hidden="true" />
+                  {daysLeft === 0 ? "오늘 만료" : `${daysLeft}일 남음`}
                 </div>
-                <div>
-                  <h3 className="font-medium text-[var(--color-charcoal)] mb-1">{coupon.name}</h3>
-                  <p className="text-xs text-[var(--color-text-muted)]">
-                    {new Intl.NumberFormat("ko-KR").format(coupon.minPrice)}원 이상 결제 시 사용 가능
+              )}
+
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <div className="text-center pr-6 border-r border-dashed border-[var(--color-beige-dark)]">
+                    <p className="text-2xl font-medium text-[var(--color-gold)]">{coupon.discount}</p>
+                    <p className="text-xs text-[var(--color-text-muted)] mt-1">할인</p>
+                  </div>
+                  <div>
+                    <h3 className="font-medium text-[var(--color-charcoal)] mb-1">{coupon.name}</h3>
+                    <p className="text-xs text-[var(--color-text-muted)]">
+                      {new Intl.NumberFormat("ko-KR").format(coupon.minPrice)}원 이상 결제 시 사용 가능
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className={`text-xs mb-2 ${isExpiringSoon ? "text-[#C75D5D] font-medium" : "text-[var(--color-text-muted)]"}`}>
+                    {coupon.expiry}까지
                   </p>
+                  {coupon.isUsed ? (
+                    <span className="text-sm text-[var(--color-text-muted)]">사용완료</span>
+                  ) : (
+                    <Link href="/search" className="btn-gold btn-sm">
+                      사용하기
+                    </Link>
+                  )}
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-xs text-[var(--color-text-muted)] mb-2">{coupon.expiry}까지</p>
-                {coupon.isUsed ? (
-                  <span className="text-sm text-[var(--color-text-muted)]">사용완료</span>
-                ) : (
-                  <Link href="/search" className="btn-gold btn-sm">
-                    사용하기
-                  </Link>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
 function SettingsTab() {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const toast = useToast();
+
+  const handleDeleteAccount = () => {
+    // 실제로는 API 호출
+    setShowDeleteModal(false);
+    toast.success("회원 탈퇴가 완료되었습니다");
+  };
+
   return (
     <div>
       <h2 className="font-display text-2xl text-[var(--color-charcoal)] mb-6">회원정보</h2>
@@ -382,8 +424,11 @@ function SettingsTab() {
                 className="object-cover"
               />
             </div>
-            <button className="absolute bottom-0 right-0 w-8 h-8 bg-[var(--color-gold)] text-white rounded-full flex items-center justify-center hover:bg-[var(--color-gold-dark)] transition-colors">
-              <Camera className="w-4 h-4" />
+            <button 
+              className="absolute bottom-0 right-0 w-8 h-8 bg-[var(--color-gold)] text-white rounded-full flex items-center justify-center hover:bg-[var(--color-gold-dark)] transition-colors"
+              aria-label="프로필 사진 변경"
+            >
+              <Camera className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
           <div>
@@ -431,7 +476,10 @@ function SettingsTab() {
             </span>
             <ChevronRight className="w-4 h-4" />
           </button>
-          <button className="w-full flex items-center justify-between py-3 text-sm text-[#C75D5D] hover:text-[#a04545] transition-colors">
+          <button 
+            onClick={() => setShowDeleteModal(true)}
+            className="w-full flex items-center justify-between py-3 text-sm text-[#C75D5D] hover:text-[#a04545] transition-colors"
+          >
             <span className="flex items-center gap-2">
               <Trash2 className="w-4 h-4" />
               회원 탈퇴
@@ -440,6 +488,69 @@ function SettingsTab() {
           </button>
         </div>
       </div>
+
+      {/* 회원 탈퇴 확인 모달 */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
+              onClick={() => setShowDeleteModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 bg-[var(--color-white)] p-8 max-w-md w-full mx-4"
+              role="dialog"
+              aria-labelledby="delete-modal-title"
+              aria-describedby="delete-modal-desc"
+            >
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center hover:bg-[var(--color-beige)] transition-colors"
+                aria-label="모달 닫기"
+              >
+                <X className="w-5 h-5" aria-hidden="true" />
+              </button>
+
+              <div className="text-center mb-6">
+                <div className="w-12 h-12 bg-[#C75D5D]/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <AlertTriangle className="w-6 h-6 text-[#C75D5D]" aria-hidden="true" />
+                </div>
+                <h3 id="delete-modal-title" className="font-display text-2xl text-[var(--color-charcoal)] mb-2">
+                  회원 탈퇴
+                </h3>
+                <p id="delete-modal-desc" className="text-sm text-[var(--color-text-secondary)] leading-relaxed">
+                  정말로 탈퇴하시겠습니까?
+                  <br />
+                  모든 예약 내역과 쿠폰이 삭제되며,
+                  <br />
+                  복구할 수 없습니다.
+                </p>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="flex-1 py-3 border border-[var(--color-beige-dark)] text-sm font-medium hover:bg-[var(--color-beige)] transition-colors"
+                >
+                  취소
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  className="flex-1 py-3 bg-[#C75D5D] text-white text-sm font-medium hover:bg-[#a04545] transition-colors"
+                >
+                  탈퇴하기
+                </button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -500,20 +611,23 @@ export default function MyPage() {
                 </div>
               </div>
 
-              <nav className="p-2">
+              <nav className="p-2" role="tablist" aria-label="마이페이지 탭">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   return (
                     <button
                       key={tab.id}
                       onClick={() => setActiveTab(tab.id)}
+                      role="tab"
+                      aria-selected={activeTab === tab.id}
+                      aria-controls={`${tab.id}-panel`}
                       className={`w-full flex items-center gap-3 px-4 py-3.5 text-sm transition-colors ${
                         activeTab === tab.id
                           ? "text-[var(--color-gold)] bg-[var(--color-beige)]/50 font-medium"
                           : "text-[var(--color-text-secondary)] hover:text-[var(--color-charcoal)] hover:bg-[var(--color-beige)]/30"
                       }`}
                     >
-                      <Icon className="w-5 h-5" />
+                      <Icon className="w-5 h-5" aria-hidden="true" />
                       {tab.label}
                     </button>
                   );
@@ -550,6 +664,9 @@ export default function MyPage() {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
+              role="tabpanel"
+              id={`${activeTab}-panel`}
+              aria-labelledby={`${activeTab}-tab`}
             >
               {renderTabContent()}
             </motion.div>

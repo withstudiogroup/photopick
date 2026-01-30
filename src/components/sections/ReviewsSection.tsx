@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { motion, useInView } from "framer-motion";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -8,13 +8,20 @@ import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/navigation";
 import { reviews } from "@/data/reviews";
+import { getRelativeTime, calculateAverageRating } from "@/utils/dateFormat";
 
 export default function ReviewsSection() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
+  
+  // 동적으로 평균 평점 계산
+  const averageRating = useMemo(() => {
+    const ratings = reviews.map((r) => r.rating);
+    return calculateAverageRating(ratings);
+  }, []);
 
   return (
-    <section ref={ref} className="py-28 md:py-36 lg:py-40 bg-[var(--color-charcoal-dark)] relative overflow-hidden">
+    <section ref={ref} className="py-28 md:py-36 lg:py-40 relative overflow-hidden" style={{ backgroundColor: '#252525' }}>
       {/* Subtle background texture */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_30%,var(--color-gold)_0%,transparent_25%)] opacity-5" />
@@ -42,7 +49,7 @@ export default function ReviewsSection() {
               ))}
             </div>
             <div className="h-6 w-px bg-white/20" />
-            <span className="text-white font-semibold text-2xl">4.9</span>
+            <span className="text-white font-semibold text-2xl">{averageRating}</span>
             <span className="text-white/50 text-lg">({reviews.length}개의 리뷰)</span>
           </div>
         </motion.div>
@@ -112,11 +119,14 @@ export default function ReviewsSection() {
                         </span>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-semibold text-white text-base mb-2">
+                        <p className="font-semibold text-white text-base mb-1">
                           {review.userName}
                         </p>
-                        <p className="text-sm text-[#888] truncate">
+                        <p className="text-sm text-[#888] truncate mb-1">
                           {review.productName}
+                        </p>
+                        <p className="text-xs text-[#666]">
+                          {getRelativeTime(review.createdAt)}
                         </p>
                       </div>
                     </div>
@@ -128,11 +138,17 @@ export default function ReviewsSection() {
 
           {/* Custom Navigation */}
           <div className="flex justify-center gap-5 mt-14">
-            <button className="review-prev w-14 h-14 rounded-full bg-[#252525] border border-[#333] flex items-center justify-center text-white/70 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 transition-all duration-300">
-              <ChevronLeft className="w-6 h-6" />
+            <button 
+              className="review-prev w-14 h-14 rounded-full bg-[#252525] border border-[#333] flex items-center justify-center text-white/70 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2 focus:ring-offset-[#252525]"
+              aria-label="이전 리뷰 보기"
+            >
+              <ChevronLeft className="w-6 h-6" aria-hidden="true" />
             </button>
-            <button className="review-next w-14 h-14 rounded-full bg-[#252525] border border-[#333] flex items-center justify-center text-white/70 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 transition-all duration-300">
-              <ChevronRight className="w-6 h-6" />
+            <button 
+              className="review-next w-14 h-14 rounded-full bg-[#252525] border border-[#333] flex items-center justify-center text-white/70 hover:border-[var(--color-gold)] hover:text-[var(--color-gold)] hover:bg-[var(--color-gold)]/10 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2 focus:ring-offset-[#252525]"
+              aria-label="다음 리뷰 보기"
+            >
+              <ChevronRight className="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
         </motion.div>

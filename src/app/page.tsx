@@ -1,5 +1,6 @@
 "use client";
 
+import PageTransition from "@/components/PageTransition";
 import {
   HeroSection,
   EventSection,
@@ -14,7 +15,7 @@ import {
 
 export default function HomePage() {
   return (
-    <>
+    <PageTransition>
       <HeroSection />
       <EventSection />
       <CategoriesSection />
@@ -24,6 +25,6 @@ export default function HomePage() {
       <ReviewsSection />
       <RegionsSection />
       <CTASection />
-    </>
+    </PageTransition>
   );
 }

@@ -22,7 +22,7 @@ export default function LoginPage() {
       <div className="hidden lg:block w-1/2 relative">
         <Image
           src="https://images.unsplash.com/photo-1519741497674-611481863552?w=1200&q=80"
-          alt="Studio"
+          alt="프리미엄 사진 스튜디오 인테리어 - 세련된 조명과 배경"
           fill
           className="object-cover"
         />
@@ -102,6 +102,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--color-text-muted)] hover:text-[var(--color-charcoal)] transition-colors"
+                  aria-label={showPassword ? "비밀번호 숨기기" : "비밀번호 표시"}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
@@ -143,8 +144,11 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-3">
-            <button className="w-full py-4 border border-[var(--color-beige-dark)] flex items-center justify-center gap-3 hover:border-[var(--color-charcoal)] transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <button 
+              className="w-full py-4 border border-[var(--color-beige-dark)] flex items-center justify-center gap-3 hover:border-[var(--color-charcoal)] transition-colors"
+              aria-label="카카오 계정으로 로그인"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   fill="#FEE500"
                   d="M12 3c5.799 0 10.5 3.664 10.5 8.185 0 4.52-4.701 8.184-10.5 8.184a13.5 13.5 0 01-1.727-.11l-4.408 2.883c-.501.265-.678.236-.472-.413l.892-3.678c-2.88-1.46-4.785-3.99-4.785-6.866C1.5 6.665 6.201 3 12 3z"
@@ -152,8 +156,11 @@ export default function LoginPage() {
               </svg>
               <span className="text-sm font-medium">카카오로 시작하기</span>
             </button>
-            <button className="w-full py-4 border border-[var(--color-beige-dark)] flex items-center justify-center gap-3 hover:border-[var(--color-charcoal)] transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <button 
+              className="w-full py-4 border border-[var(--color-beige-dark)] flex items-center justify-center gap-3 hover:border-[var(--color-charcoal)] transition-colors"
+              aria-label="네이버 계정으로 로그인"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   fill="#03C75A"
                   d="M16.273 12.845L7.376 0H0v24h7.726V11.156L16.624 24H24V0h-7.727z"
@@ -161,8 +168,11 @@ export default function LoginPage() {
               </svg>
               <span className="text-sm font-medium">네이버로 시작하기</span>
             </button>
-            <button className="w-full py-4 border border-[var(--color-beige-dark)] flex items-center justify-center gap-3 hover:border-[var(--color-charcoal)] transition-colors">
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+            <button 
+              className="w-full py-4 border border-[var(--color-beige-dark)] flex items-center justify-center gap-3 hover:border-[var(--color-charcoal)] transition-colors"
+              aria-label="Google 계정으로 로그인"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
                 <path
                   fill="#4285F4"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"

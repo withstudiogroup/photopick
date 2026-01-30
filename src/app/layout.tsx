@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import "./globals.css";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import { ToastContainer } from "@/components/ui/Toast";
 
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -71,6 +72,7 @@ export default function RootLayout({
         <Header />
         <main>{children}</main>
         <Footer />
+        <ToastContainer />
       </body>
     </html>
   );

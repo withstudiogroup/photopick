@@ -30,7 +30,15 @@ function StepProgress({ currentStep }: { currentStep: number }) {
   ];
 
   return (
-    <div className="flex items-center justify-center gap-1 md:gap-2 mb-10">
+    <nav 
+      className="flex items-center justify-center gap-1 md:gap-2 mb-10" 
+      aria-label="예약 진행 단계"
+      role="progressbar"
+      aria-valuenow={currentStep}
+      aria-valuemin={1}
+      aria-valuemax={5}
+      aria-valuetext={steps.find(s => s.id === currentStep)?.label}
+    >
       {steps.map((step, index) => (
         <div key={step.id} className="flex items-center">
           <div className="flex flex-col items-center">
@@ -42,9 +50,10 @@ function StepProgress({ currentStep }: { currentStep: number }) {
                   ? "bg-[var(--color-charcoal)] text-white"
                   : "bg-[var(--color-beige)] text-[var(--color-text-muted)]"
               }`}
+              aria-current={step.id === currentStep ? "step" : undefined}
             >
               {step.id < currentStep ? (
-                <Check className="w-5 h-5" />
+                <Check className="w-5 h-5" aria-label="완료" />
               ) : (
                 step.id
               )}
@@ -60,11 +69,12 @@ function StepProgress({ currentStep }: { currentStep: number }) {
               className={`w-8 md:w-16 h-[2px] mx-1 md:mx-2 transition-colors ${
                 step.id < currentStep ? "bg-[var(--color-gold)]" : "bg-[var(--color-beige-dark)]"
               }`}
+              aria-hidden="true"
             />
           )}
         </div>
       ))}
-    </div>
+    </nav>
   );
 }
 
@@ -104,36 +114,39 @@ function BookingCalendar({
         <button
           onClick={prevMonth}
           className="w-10 h-10 flex items-center justify-center hover:bg-[var(--color-beige)] transition-colors"
+          aria-label="이전 달"
         >
           <ChevronLeft className="w-5 h-5" />
         </button>
-        <h3 className="font-display text-xl text-[var(--color-charcoal)]">
+        <h3 className="font-display text-xl text-[var(--color-charcoal)]" id="calendar-title">
           {format(currentMonth, "yyyy년 M월", { locale: ko })}
         </h3>
         <button
           onClick={nextMonth}
           className="w-10 h-10 flex items-center justify-center hover:bg-[var(--color-beige)] transition-colors"
+          aria-label="다음 달"
         >
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 mb-4">
+      <div className="grid grid-cols-7 mb-4" role="row">
         {["일", "월", "화", "수", "목", "금", "토"].map((day, index) => (
           <div
             key={day}
             className={`text-center text-sm font-medium py-2 ${
               index === 0 ? "text-[#C75D5D]" : index === 6 ? "text-[#5D8AC7]" : "text-[var(--color-text-secondary)]"
             }`}
+            role="columnheader"
           >
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">
+      <div className="grid grid-cols-7 gap-1" role="grid" aria-label="날짜 선택">
         {[...Array(startDay)].map((_, i) => (
-          <div key={`empty-${i}`} className="aspect-square" />
+          <div key={`empty-${i}`} className="aspect-square" role="gridcell" />
         ))}
 
         {days.map((day) => {
@@ -147,6 +160,10 @@ function BookingCalendar({
               key={day.toISOString()}
               onClick={() => !disabled && onSelectDate(day)}
               disabled={disabled}
+              role="gridcell"
+              aria-label={`${format(currentMonth, "yyyy년 M월", { locale: ko })} ${format(day, "d일", { locale: ko })}`}
+              aria-selected={selected ? true : undefined}
+              aria-disabled={disabled ? true : undefined}
               className={`aspect-square flex items-center justify-center text-sm transition-all ${
                 disabled
                   ? "text-[var(--color-beige-dark)] cursor-not-allowed"
@@ -192,13 +209,16 @@ function TimeSlots({
 
   return (
     <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-6 md:p-8">
-      <h3 className="font-display text-lg text-[var(--color-charcoal)] mb-6">시간 선택</h3>
-      <div className="grid grid-cols-5 gap-2">
+      <h3 className="font-display text-lg text-[var(--color-charcoal)] mb-6" id="time-selection-title">시간 선택</h3>
+      <div className="grid grid-cols-3 md:grid-cols-5 gap-2" role="radiogroup" aria-labelledby="time-selection-title">
         {timeSlots.map((slot) => (
           <button
             key={slot.time}
             onClick={() => slot.available && onSelectTime(slot.time)}
             disabled={!slot.available}
+            role="radio"
+            aria-checked={selectedTime === slot.time}
+            aria-label={`${slot.time} ${!slot.available ? '예약 마감' : ''}`}
             className={`py-3 text-sm font-medium transition-all ${
               !slot.available
                 ? "bg-[var(--color-beige)] text-[var(--color-text-muted)] cursor-not-allowed line-through"
@@ -208,10 +228,11 @@ function TimeSlots({
             }`}
           >
             {slot.time}
+            {!slot.available && <span className="sr-only">예약 마감</span>}
           </button>
         ))}
       </div>
-      <p className="mt-4 text-xs text-[var(--color-text-muted)]">
+      <p className="mt-4 text-xs text-[var(--color-text-muted)]" role="note">
         * 취소선이 있는 시간은 예약이 마감된 시간입니다
       </p>
     </div>
@@ -413,32 +434,39 @@ function InfoStep({
       <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-8 mb-6">
         <div className="space-y-6">
           <div>
-            <label className="form-label">
-              이름 <span className="text-[#C75D5D]">*</span>
+            <label htmlFor="booking-name" className="form-label">
+              이름 <span className="text-[#C75D5D]" aria-label="필수">*</span>
             </label>
             <input
+              id="booking-name"
               type="text"
               value={formData.name}
               onChange={(e) => onUpdateForm("name", e.target.value)}
               placeholder="홍길동"
               className="form-input"
+              required
+              aria-required="true"
             />
           </div>
           <div>
-            <label className="form-label">
-              연락처 <span className="text-[#C75D5D]">*</span>
+            <label htmlFor="booking-phone" className="form-label">
+              연락처 <span className="text-[#C75D5D]" aria-label="필수">*</span>
             </label>
             <input
+              id="booking-phone"
               type="tel"
               value={formData.phone}
               onChange={(e) => onUpdateForm("phone", e.target.value)}
               placeholder="010-1234-5678"
               className="form-input"
+              required
+              aria-required="true"
             />
           </div>
           <div>
-            <label className="form-label">이메일</label>
+            <label htmlFor="booking-email" className="form-label">이메일</label>
             <input
+              id="booking-email"
               type="email"
               value={formData.email}
               onChange={(e) => onUpdateForm("email", e.target.value)}
@@ -447,13 +475,15 @@ function InfoStep({
             />
           </div>
           <div>
-            <label className="form-label">요청사항</label>
+            <label htmlFor="booking-requests" className="form-label">요청사항</label>
             <textarea
+              id="booking-requests"
               value={formData.requests}
               onChange={(e) => onUpdateForm("requests", e.target.value)}
               placeholder="스튜디오에 전달할 요청사항을 입력해주세요"
               rows={4}
               className="form-input resize-none"
+              maxLength={500}
             />
           </div>
         </div>
@@ -464,34 +494,41 @@ function InfoStep({
           <label className="checkbox-custom">
             <input
               type="checkbox"
+              id="booking-agree-terms"
               checked={formData.agreements[0]}
               onChange={(e) => {
                 const newAgreements = [...formData.agreements];
                 newAgreements[0] = e.target.checked;
                 onUpdateForm("agreements", newAgreements);
               }}
+              required
+              aria-required="true"
             />
             <span className="text-sm">
-              <span className="text-[#C75D5D] font-medium">[필수]</span> 이용약관에 동의합니다
+              <span className="text-[#C75D5D] font-medium" aria-label="필수">[필수]</span> 이용약관에 동의합니다
             </span>
           </label>
           <label className="checkbox-custom">
             <input
               type="checkbox"
+              id="booking-agree-privacy"
               checked={formData.agreements[1]}
               onChange={(e) => {
                 const newAgreements = [...formData.agreements];
                 newAgreements[1] = e.target.checked;
                 onUpdateForm("agreements", newAgreements);
               }}
+              required
+              aria-required="true"
             />
             <span className="text-sm">
-              <span className="text-[#C75D5D] font-medium">[필수]</span> 개인정보 수집 및 이용에 동의합니다
+              <span className="text-[#C75D5D] font-medium" aria-label="필수">[필수]</span> 개인정보 수집 및 이용에 동의합니다
             </span>
           </label>
           <label className="checkbox-custom">
             <input
               type="checkbox"
+              id="booking-agree-marketing"
               checked={formData.agreements[2]}
               onChange={(e) => {
                 const newAgreements = [...formData.agreements];
@@ -599,25 +636,28 @@ function PaymentStep({
       </div>
 
       <div className="bg-[var(--color-white)] border border-[var(--color-beige-dark)] p-8 mb-10">
-        <h3 className="font-medium text-[var(--color-charcoal)] mb-4 pb-4 border-b border-[var(--color-beige)]">결제 수단</h3>
-        <div className="grid grid-cols-2 gap-3">
+        <h3 className="font-medium text-[var(--color-charcoal)] mb-4 pb-4 border-b border-[var(--color-beige)]" id="payment-method-title">결제 수단</h3>
+        <div className="grid grid-cols-2 gap-3" role="radiogroup" aria-labelledby="payment-method-title">
           {paymentMethods.map((method) => (
             <button
               key={method.id}
               onClick={() => setPaymentMethod(method.id)}
+              role="radio"
+              aria-checked={paymentMethod === method.id}
+              aria-label={`${method.label}로 결제`}
               className={`py-4 text-sm font-medium transition-all border flex items-center justify-center gap-2 ${
                 paymentMethod === method.id
                   ? "border-[var(--color-gold)] bg-[var(--color-beige)]/30 text-[var(--color-gold)]"
                   : "border-[var(--color-beige-dark)] hover:border-[var(--color-gold)]"
               }`}
             >
-              <span>{method.icon}</span>
+              <span aria-hidden="true">{method.icon}</span>
               {method.label}
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2 mt-4 text-xs text-[var(--color-text-muted)]">
-          <Shield className="w-4 h-4" />
+        <div className="flex items-center gap-2 mt-4 text-xs text-[var(--color-text-muted)]" role="note">
+          <Shield className="w-4 h-4" aria-hidden="true" />
           안전한 결제를 위해 SSL 암호화를 사용합니다
         </div>
       </div>

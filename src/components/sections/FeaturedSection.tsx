@@ -43,12 +43,22 @@ export default function FeaturedSection() {
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="flex gap-3 mb-14 overflow-x-auto scrollbar-hide pb-2"
+          className="relative mb-14"
         >
+          {/* Scroll fade hint */}
+          <div className="absolute top-0 right-0 bottom-2 w-20 bg-gradient-to-l from-[var(--color-ivory)] to-transparent pointer-events-none z-10" aria-hidden="true" />
+          
+          <div
+            className="flex gap-3 overflow-x-auto scrollbar-hide pb-2"
+            role="group"
+            aria-label="카테고리 필터"
+          >
           {categories.map((cat, index) => (
             <button
               key={cat.id}
-              className={`px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-all ${
+              aria-pressed={index === 0}
+              aria-label={`${cat.label} 스튜디오 필터`}
+              className={`px-5 py-2.5 text-sm font-medium whitespace-nowrap transition-all rounded focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2 ${
                 index === 0
                   ? "bg-[var(--color-charcoal)] text-white"
                   : "bg-white text-[var(--color-text-secondary)] hover:bg-[var(--color-charcoal)] hover:text-white border border-[var(--color-beige-dark)]"
@@ -57,6 +67,7 @@ export default function FeaturedSection() {
               {cat.label}
             </button>
           ))}
+          </div>
         </motion.div>
 
         {/* Studios Grid */}

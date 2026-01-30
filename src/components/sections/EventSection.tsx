@@ -70,7 +70,11 @@ export default function EventSection() {
             modules={[Navigation, Autoplay]}
             spaceBetween={24}
             slidesPerView={1}
-            autoplay={{ delay: 4000, disableOnInteraction: false }}
+            autoplay={{ delay: 6000, disableOnInteraction: false }}
+            navigation={{
+              nextEl: '.event-swiper-next',
+              prevEl: '.event-swiper-prev',
+            }}
             breakpoints={{
               640: { slidesPerView: 2 },
               1024: { slidesPerView: 3 },
@@ -80,11 +84,13 @@ export default function EventSection() {
             {events.map((event) => (
               <SwiperSlide key={event.id}>
                 <Link href={`/events/${event.id}`} className="block group">
-                  <div className="relative aspect-[16/9] overflow-hidden">
+                   <div className="relative aspect-[16/9] overflow-hidden">
                     <Image
                       src={event.image}
-                      alt={event.title}
+                      alt={`${event.title} - ${event.subtitle}`}
                       fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                      quality={70}
                       className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -101,6 +107,18 @@ export default function EventSection() {
               </SwiperSlide>
             ))}
           </Swiper>
+          
+          {/* Navigation Buttons */}
+          <div className="hidden md:flex">
+            <button 
+              className="event-swiper-prev"
+              aria-label="이전 이벤트"
+            />
+            <button 
+              className="event-swiper-next"
+              aria-label="다음 이벤트"
+            />
+          </div>
         </motion.div>
       </div>
     </section>

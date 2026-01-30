@@ -43,16 +43,16 @@ export default function Header() {
                   Pick
                 </span>
                 <motion.div
-                  className="absolute -bottom-1 left-0 h-[2px] bg-[var(--color-gold)]"
-                  initial={{ width: 0 }}
-                  whileHover={{ width: "100%" }}
+                  className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[var(--color-gold)] origin-left"
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
                   transition={{ duration: 0.3 }}
                 />
               </div>
             </Link>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-8">
+            <nav className="hidden lg:flex items-center gap-8" aria-label="주요 메뉴">
               {[
                 { href: "/search", label: "스튜디오 찾기" },
                 { href: "/categories", label: "촬영 유형" },
@@ -62,10 +62,10 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`text-[13px] font-medium tracking-wide uppercase transition-colors underline-animation ${
+                  className={`text-[13px] font-medium tracking-wide uppercase transition-colors underline-animation focus:outline-none focus:ring-2 focus:ring-offset-2 rounded px-2 py-1 ${
                     isScrolled
-                      ? "text-[var(--color-charcoal)] hover:text-[var(--color-gold)]"
-                      : "text-white/90 hover:text-white"
+                      ? "text-[var(--color-charcoal)] hover:text-[var(--color-gold)] focus:ring-[var(--color-gold)]"
+                      : "text-white/90 hover:text-white focus:ring-white"
                   }`}
                 >
                   {item.label}
@@ -78,53 +78,58 @@ export default function Header() {
               {/* Search Button */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className={`p-2 rounded-full transition-colors ${
+                aria-label="검색 열기"
+                className={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isScrolled
-                    ? "hover:bg-[var(--color-beige)] text-[var(--color-charcoal)]"
-                    : "hover:bg-white/10 text-white"
+                    ? "hover:bg-[var(--color-beige)] text-[var(--color-charcoal)] focus:ring-[var(--color-gold)]"
+                    : "hover:bg-white/10 text-white focus:ring-white"
                 }`}
               >
-                <Search className="w-5 h-5" />
+                <Search className="w-5 h-5" aria-hidden="true" />
               </button>
 
               {/* Wishlist */}
               <Link
                 href="/wishlist"
-                className={`p-2 rounded-full transition-colors hidden sm:flex ${
+                aria-label="찜 목록"
+                className={`p-2 rounded-full transition-colors hidden sm:flex focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isScrolled
-                    ? "hover:bg-[var(--color-beige)] text-[var(--color-charcoal)]"
-                    : "hover:bg-white/10 text-white"
+                    ? "hover:bg-[var(--color-beige)] text-[var(--color-charcoal)] focus:ring-[var(--color-gold)]"
+                    : "hover:bg-white/10 text-white focus:ring-white"
                 }`}
               >
-                <Heart className="w-5 h-5" />
+                <Heart className="w-5 h-5" aria-hidden="true" />
               </Link>
 
               {/* User Menu */}
               <Link
                 href="/login"
-                className={`hidden sm:flex items-center gap-2 px-4 py-2 text-[13px] font-medium tracking-wide transition-all ${
+                className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded text-[13px] font-medium tracking-wide transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isScrolled
-                    ? "text-[var(--color-charcoal)] hover:text-[var(--color-gold)]"
-                    : "text-white hover:text-[var(--color-gold)]"
+                    ? "text-[var(--color-charcoal)] hover:text-[var(--color-gold)] focus:ring-[var(--color-gold)]"
+                    : "text-white hover:text-[var(--color-gold)] focus:ring-white"
                 }`}
               >
-                <User className="w-4 h-4" />
+                <User className="w-4 h-4" aria-hidden="true" />
                 <span>로그인</span>
               </Link>
 
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`lg:hidden p-2 rounded-full transition-colors ${
+                aria-label={isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기"}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
+                className={`lg:hidden p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 ${
                   isScrolled
-                    ? "hover:bg-[var(--color-beige)] text-[var(--color-charcoal)]"
-                    : "hover:bg-white/10 text-white"
+                    ? "hover:bg-[var(--color-beige)] text-[var(--color-charcoal)] focus:ring-[var(--color-gold)]"
+                    : "hover:bg-white/10 text-white focus:ring-white"
                 }`}
               >
                 {isMobileMenuOpen ? (
-                  <X className="w-5 h-5" />
+                  <X className="w-5 h-5" aria-hidden="true" />
                 ) : (
-                  <Menu className="w-5 h-5" />
+                  <Menu className="w-5 h-5" aria-hidden="true" />
                 )}
               </button>
             </div>
@@ -136,12 +141,13 @@ export default function Header() {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
+            id="mobile-menu"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             className="fixed inset-0 z-40 bg-[var(--color-charcoal)] pt-20"
           >
-            <nav className="container-wide py-8">
+            <nav className="container-wide py-8" aria-label="모바일 메뉴">
               <div className="space-y-6">
                 {[
                   { href: "/search", label: "스튜디오 찾기" },
@@ -160,7 +166,7 @@ export default function Header() {
                     <Link
                       href={item.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="block font-display text-3xl text-white hover:text-[var(--color-gold)] transition-colors"
+                      className="block font-display text-3xl text-white hover:text-[var(--color-gold)] transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] rounded px-2 py-1"
                     >
                       {item.label}
                     </Link>
@@ -204,12 +210,15 @@ export default function Header() {
                 </div>
 
                 {/* Search Tabs */}
-                <div className="flex gap-6 mb-6 border-b border-[var(--color-beige-dark)]">
+                <div className="flex gap-6 mb-6 border-b border-[var(--color-beige-dark)]" role="tablist" aria-label="촬영 유형 탭">
                   {["프로필", "웨딩", "가족", "증명사진", "컨셉촬영"].map(
                     (tab, index) => (
                       <button
                         key={tab}
-                        className={`pb-4 text-sm font-medium transition-colors ${
+                        role="tab"
+                        aria-selected={index === 0}
+                        aria-controls={`search-panel-${index}`}
+                        className={`pb-4 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] rounded px-2 ${
                           index === 0
                             ? "text-[var(--color-gold)] border-b-2 border-[var(--color-gold)]"
                             : "text-[var(--color-text-muted)] hover:text-[var(--color-charcoal)]"
@@ -222,26 +231,37 @@ export default function Header() {
                 </div>
 
                 {/* Search Form */}
-                <div className="grid md:grid-cols-4 gap-4">
+                <form className="grid md:grid-cols-4 gap-4" role="search" aria-label="상세 스튜디오 검색">
                   <div className="relative">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)]" />
+                    <label htmlFor="modal-search-location" className="sr-only">촬영 지역</label>
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)] pointer-events-none" aria-hidden="true" />
                     <input
+                      id="modal-search-location"
                       type="text"
                       placeholder="지역 선택"
-                      className="w-full pl-12 pr-4 py-4 bg-[var(--color-beige)] border-0 text-[15px] focus:ring-2 focus:ring-[var(--color-gold)] outline-none"
+                      aria-label="촬영 지역 선택"
+                      className="w-full pl-12 pr-4 py-4 bg-[var(--color-beige)] border-0 text-[15px] focus:ring-2 focus:ring-[var(--color-gold)] outline-none rounded"
                     />
                   </div>
                   <div className="relative">
-                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)]" />
+                    <label htmlFor="modal-search-date" className="sr-only">촬영 날짜</label>
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)] pointer-events-none" aria-hidden="true" />
                     <input
+                      id="modal-search-date"
                       type="text"
                       placeholder="날짜 선택"
-                      className="w-full pl-12 pr-4 py-4 bg-[var(--color-beige)] border-0 text-[15px] focus:ring-2 focus:ring-[var(--color-gold)] outline-none"
+                      aria-label="촬영 날짜 선택"
+                      className="w-full pl-12 pr-4 py-4 bg-[var(--color-beige)] border-0 text-[15px] focus:ring-2 focus:ring-[var(--color-gold)] outline-none rounded"
                     />
                   </div>
                   <div className="relative">
-                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)]" />
-                    <select className="w-full pl-12 pr-4 py-4 bg-[var(--color-beige)] border-0 text-[15px] focus:ring-2 focus:ring-[var(--color-gold)] outline-none appearance-none">
+                    <label htmlFor="modal-search-people" className="sr-only">인원 수</label>
+                    <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--color-text-muted)] pointer-events-none" aria-hidden="true" />
+                    <select 
+                      id="modal-search-people"
+                      aria-label="인원 수 선택"
+                      className="w-full pl-12 pr-4 py-4 bg-[var(--color-beige)] border-0 text-[15px] focus:ring-2 focus:ring-[var(--color-gold)] outline-none appearance-none rounded"
+                    >
                       <option>인원 선택</option>
                       <option>1명</option>
                       <option>2명</option>
@@ -249,11 +269,11 @@ export default function Header() {
                       <option>4명 이상</option>
                     </select>
                   </div>
-                  <button className="btn-gold">
-                    <Search className="w-4 h-4" />
+                  <button type="submit" className="btn-gold focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2">
+                    <Search className="w-4 h-4" aria-hidden="true" />
                     <span>검색</span>
                   </button>
-                </div>
+                </form>
 
                 {/* Popular Keywords */}
                 <div className="mt-6">

@@ -73,12 +73,18 @@ export default function CategoriesSection() {
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.6, delay: index * 0.1 }}
             >
-              <Link href={`/search?category=${cat.id}`} className="block group">
+              <Link 
+                href={`/search?category=${cat.id}`} 
+                className="block group focus:outline-none focus:ring-2 focus:ring-[var(--color-gold)] focus:ring-offset-2 focus:ring-offset-[var(--color-charcoal)] rounded-sm"
+                aria-label={`${cat.label} 스튜디오 ${cat.count}개 보기`}
+              >
                 <div className="relative aspect-[3/4] overflow-hidden rounded-sm">
                   <Image
                     src={cat.image}
-                    alt={cat.label}
+                    alt={`${cat.label} 촬영 카테고리`}
                     fill
+                    sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 16vw"
+                    quality={70}
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
